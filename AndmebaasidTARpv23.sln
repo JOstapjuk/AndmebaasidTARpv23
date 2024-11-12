@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35209.166
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AndmebaasidTARpv23", "AndmebaasidTARpv23.csproj", "{816B16CA-A3B6-44D9-A350-D3DB099EA994}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{816B16CA-A3B6-44D9-A350-D3DB099EA994}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{816B16CA-A3B6-44D9-A350-D3DB099EA994}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{816B16CA-A3B6-44D9-A350-D3DB099EA994}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{816B16CA-A3B6-44D9-A350-D3DB099EA994}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4E5C29E5-9F76-4952-83F5-F124310A43BA}
+	EndGlobalSection
+EndGlobal
