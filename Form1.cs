@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -99,68 +100,18 @@ namespace AndmebaasidTARpv23
             }
         }
 
-        //private void Uuenda_btn_Click(object sender, EventArgs e)
-        //{
-        //    if (Nimetus_txt.Text.Trim() != string.Empty || Kogus_txt.Text.Trim() != string.Empty || Hind_txt.Text.Trim() != string.Empty)
-        //    {
-        //        try
-        //        {
-        //            conn.Open();
-        //            cmd = new SqlCommand("update Tooded set Nimetus = @nimetus, Kogus = @kogus, Hind = @hind where Id = @ID", conn);
-        //            cmd.Parameters.AddWithValue("@nimetus", Nimetus_txt.Text);
-        //            cmd.Parameters.AddWithValue("@ID", Id_txt.Text);
-        //            cmd.Parameters.AddWithValue("@kogus", Kogus_txt.Text);
-        //            cmd.Parameters.AddWithValue("@hind", Hind_txt.Text);
-        //            cmd.ExecuteNonQuery();
-        //            conn.Close();
-        //            NaitaAndmed();
-        //        }
-        //        catch
-        //        {
-        //            MessageBox.Show("Admebaasiga viga!");
-        //        }
-        //    }
-        //    else 
-        //    {
-        //        MessageBox.Show("Sisesta andmed mille tahate uuenda");
-        //    }
-        //}
-
-        private void Uuenda_btn_Click()
+        private void Uuenda_btn_Click(object sender, EventArgs e)
         {
-            if (Id_txt.Text.Trim() != string.Empty)
+            if (Nimetus_txt.Text.Trim() != string.Empty || Kogus_txt.Text.Trim() != string.Empty || Hind_txt.Text.Trim() != string.Empty)
             {
                 try
                 {
                     conn.Open();
-
-                    string paring = "update Tooded set ";
-                    bool esimine = true;
-
-                    if (Nimetus_txt.Text.Trim() != string.Empty)
-                    {
-                        paring += "Nimetus = @nimetus";
-                        cmd.Parameters.AddWithValue("@nimetus", Nimetus_txt.Text);
-                        esimine = false;
-                    }
-                    else if (Kogus_txt.Text.Trim() != string.Empty)
-                    {
-                        if (!esimine) paring += ", "; 
-                        paring += "Kogus = @kogus";
-                        cmd.Parameters.AddWithValue("@kogus", Kogus_txt.Text);
-                        esimine = false;
-                    }
-                    else (Hind_txt.Text.Trim() != string.Empty)
-                    {
-                        if (!esimine) paring += ", ";
-                        paring += "Hind = @hind";
-                        cmd.Parameters.AddWithValue("@hind", Hind_txt.Text);
-                    }
-
-                    paring += " where Id = @ID";
-                    cmd = new SqlCommand(paring, conn);
+                    cmd = new SqlCommand("update Tooded set Nimetus = @nimetus, Kogus = @kogus, Hind = @hind where Id = @ID", conn);
+                    cmd.Parameters.AddWithValue("@nimetus", Nimetus_txt.Text);
                     cmd.Parameters.AddWithValue("@ID", Id_txt.Text);
-
+                    cmd.Parameters.AddWithValue("@kogus", Kogus_txt.Text);
+                    cmd.Parameters.AddWithValue("@hind", Hind_txt.Text);
                     cmd.ExecuteNonQuery();
                     conn.Close();
                     NaitaAndmed();
@@ -172,7 +123,50 @@ namespace AndmebaasidTARpv23
             }
             else
             {
-                MessageBox.Show("Sisesta Id");
+                MessageBox.Show("Sisesta andmed mille tahate uuenda");
+            }
+        }
+
+        int ID = 0;
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                ID = (int)dataGridView1.Rows[e.RowIndex].Cells["Id"].Value;
+                Nimetus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Nimetus"].Value.ToString();
+                Kogus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Kogus"].Value.ToString();
+                Hind_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Hind"].Value.ToString();
+            }
+        }
+
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog open = new OpenFileDialog
+            {
+                InitialDirectory = @"C:\Users\opilane\Pictures\",
+                Multiselect = false,
+                Filter = "Image Files(*.jpeg;*.png;*.bmp;*.jpg)|*.jpeg;*.png;*.bmp;*.jpg"
+            };
+
+            if (open.ShowDialog() == DialogResult.OK && !string.IsNullOrEmpty(Nimetus_txt.Text))
+            {
+                SaveFileDialog save = new SaveFileDialog
+                {
+                    InitialDirectory = Path.GetFullPath(@"..\..\..\pildid"),
+                    FileName = Nimetus_txt.Text + Path.GetExtension(open.FileName),
+                    Filter = "Images|*" + Path.GetExtension(open.FileName)
+                };
+
+                if (save.ShowDialog() == DialogResult.OK)
+                {
+                    File.Copy(open.FileName, save.FileName, true);
+                    pictureBox1.Image = Image.FromFile(save.FileName);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Puudub toote nimetus või Cancel vajutatud", "Viga", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
     }
