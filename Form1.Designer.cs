@@ -39,7 +39,6 @@ namespace AndmebaasidTARpv23
             this.label3 = new System.Windows.Forms.Label();
             this.andmebaasDataSetBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.Btn_lisa = new System.Windows.Forms.Button();
-            this.andmebaas = new AndmebaasidTARpv23.Andmebaas();
             this.andmebaasBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.Btn_kustuta = new System.Windows.Forms.Button();
@@ -49,7 +48,6 @@ namespace AndmebaasidTARpv23
             this.button1 = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.andmebaasDataSetBindingSource)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.andmebaas)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.andmebaasBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -125,12 +123,9 @@ namespace AndmebaasidTARpv23
             // 
             // andmebaas
             // 
-            this.andmebaas.DataSetName = "Andmebaas";
-            this.andmebaas.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
             // 
             // andmebaasBindingSource
             // 
-            this.andmebaasBindingSource.DataSource = this.andmebaas;
             this.andmebaasBindingSource.Position = 0;
             // 
             // dataGridView1
@@ -226,7 +221,6 @@ namespace AndmebaasidTARpv23
             this.Name = "Form1";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.andmebaasDataSetBindingSource)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.andmebaas)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.andmebaasBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
@@ -246,7 +240,6 @@ namespace AndmebaasidTARpv23
         private System.Windows.Forms.BindingSource andmebaasDataSetBindingSource;
         private System.Windows.Forms.Button Btn_lisa;
         private System.Windows.Forms.BindingSource andmebaasBindingSource;
-        private Andmebaas andmebaas;
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.Button Btn_kustuta;
         private System.Windows.Forms.Label label4;

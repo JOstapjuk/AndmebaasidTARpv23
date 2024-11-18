@@ -14,9 +14,12 @@ namespace AndmebaasidTARpv23
 {
     public partial class Form1 : Form
     {
-        SqlConnection conn = new SqlConnection(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Andmebaas;Integrated Security=True");
+        SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\jeliz\source\repos\AndmebaasidTARpv23\Andmebaas.mdf;Integrated Security=True");
         SqlCommand cmd;
         SqlDataAdapter adapter;
+        OpenFileDialog open;
+        SaveFileDialog save;
+        string extension;
         public Form1()
         {
             InitializeComponent();
@@ -27,7 +30,7 @@ namespace AndmebaasidTARpv23
         {
             conn.Open();
             DataTable dt = new DataTable();
-            cmd = new SqlCommand("SELECT * FROM Tooded", conn);
+            cmd = new SqlCommand("SELECT * FROM Toode", conn);
             adapter = new SqlDataAdapter(cmd);
             adapter.Fill(dt);
             dataGridView1.DataSource = dt;
@@ -41,17 +44,18 @@ namespace AndmebaasidTARpv23
                 try 
                 {
                     conn.Open();
-                    cmd = new SqlCommand("insert into Tooded(Nimetus,Kogus,Hind) values (@toode,@kogus,@hind)",conn);
-                    cmd.Parameters.AddWithValue("@toode",Nimetus_txt.Text);
+                    cmd = new SqlCommand("insert into Toode(Nimetus,Kogus,Hind,Pilt) values (@nimetus,@kogus,@hind,@pilt)", conn); 
+                    cmd.Parameters.AddWithValue("@nimetus",Nimetus_txt.Text);
                     cmd.Parameters.AddWithValue("@kogus", Kogus_txt.Text);
                     cmd.Parameters.AddWithValue("@hind", Hind_txt.Text);
+                    cmd.Parameters.AddWithValue("@pilt", Nimetus_txt.Text + extension);
                     cmd.ExecuteNonQuery();
                     conn.Close();
                     NaitaAndmed();
                 }
-                catch 
+                catch (Exception ex)
                 {
-                    MessageBox.Show("Admebaasiga viga!");
+                    MessageBox.Show($"Admebaasiga viga! \n\n{ex.Message}");
                 }
             }
             else
@@ -67,7 +71,7 @@ namespace AndmebaasidTARpv23
                 try
                 {
                     conn.Open();
-                    cmd = new SqlCommand("delete from Tooded where Id = @ID", conn);
+                    cmd = new SqlCommand("delete from Toode where Id = @ID", conn);
                     cmd.Parameters.AddWithValue("@ID",Id_txt.Text);
                     cmd.ExecuteNonQuery();
                     conn.Close();
@@ -83,7 +87,7 @@ namespace AndmebaasidTARpv23
                 try
                 {
                     conn.Open();
-                    cmd = new SqlCommand("delete Tooded where Nimetus = @nimetus", conn);
+                    cmd = new SqlCommand("delete Toode where Nimetus = @nimetus", conn);
                     cmd.Parameters.AddWithValue("@nimetus", Nimetus_txt.Text);
                     cmd.ExecuteNonQuery();
                     conn.Close();
@@ -102,19 +106,21 @@ namespace AndmebaasidTARpv23
 
         private void Uuenda_btn_Click(object sender, EventArgs e)
         {
-            if (Nimetus_txt.Text.Trim() != string.Empty || Kogus_txt.Text.Trim() != string.Empty || Hind_txt.Text.Trim() != string.Empty)
+            if (Nimetus_txt.Text.Trim() != string.Empty && Kogus_txt.Text.Trim() != string.Empty && Hind_txt.Text.Trim() != string.Empty)
             {
                 try
                 {
                     conn.Open();
-                    cmd = new SqlCommand("update Tooded set Nimetus = @nimetus, Kogus = @kogus, Hind = @hind where Id = @ID", conn);
+                    cmd = new SqlCommand("update Toode SET Nimetus = @nimetus, Kogus = @kogus, Hind = @hind, Pilt = @pilt WHERE Id = @ID", conn);
                     cmd.Parameters.AddWithValue("@nimetus", Nimetus_txt.Text);
                     cmd.Parameters.AddWithValue("@ID", Id_txt.Text);
                     cmd.Parameters.AddWithValue("@kogus", Kogus_txt.Text);
                     cmd.Parameters.AddWithValue("@hind", Hind_txt.Text);
+                    cmd.Parameters.AddWithValue("@pilt", Nimetus_txt.Text + extension);
                     cmd.ExecuteNonQuery();
                     conn.Close();
                     NaitaAndmed();
+                    Emalda();
                 }
                 catch
                 {
@@ -127,46 +133,60 @@ namespace AndmebaasidTARpv23
             }
         }
 
+        private void Emalda()
+        {
+            MessageBox.Show("Andmed elukalt uuendatud", "Uuendamine");
+            Nimetus_txt.Text = "";
+            Kogus_txt.Text = "";
+            Hind_txt.Text = "";
+            pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\pildid"), "error.png"));
+        }
+
         int ID = 0;
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0)
+            ID = (int)dataGridView1.Rows[e.RowIndex].Cells["Id"].Value;
+            Nimetus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Nimetus"].Value.ToString();
+            Kogus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Kogus"].Value.ToString();
+            Hind_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Hind"].Value.ToString();
+            try
             {
-                ID = (int)dataGridView1.Rows[e.RowIndex].Cells["Id"].Value;
-                Nimetus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Nimetus"].Value.ToString();
-                Kogus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Kogus"].Value.ToString();
-                Hind_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Hind"].Value.ToString();
+                pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\pildid"),
+                    dataGridView1.Rows[e.RowIndex].Cells["Pilt"].Value.ToString()));
+                pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+            }
+            catch (Exception)
+            {
+                pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\pildid"), "error.png"));
             }
         }
 
 
+
         private void button1_Click(object sender, EventArgs e)
         {
-            OpenFileDialog open = new OpenFileDialog
-            {
-                InitialDirectory = @"C:\Users\opilane\Pictures\",
-                Multiselect = false,
-                Filter = "Image Files(*.jpeg;*.png;*.bmp;*.jpg)|*.jpeg;*.png;*.bmp;*.jpg"
-            };
+            open = new OpenFileDialog();
+            open.InitialDirectory = @"C:\Users\opilane\Pictures\";
+            open.Multiselect = false;
+            open.Filter = "Image Files(*.jpeg;*.png;*.bmp;*.jpg)|*.jpeg;*.png;*.bmp;*.jpg";
 
             if (open.ShowDialog() == DialogResult.OK && !string.IsNullOrEmpty(Nimetus_txt.Text))
             {
-                SaveFileDialog save = new SaveFileDialog
-                {
-                    InitialDirectory = Path.GetFullPath(@"..\..\..\pildid"),
-                    FileName = Nimetus_txt.Text + Path.GetExtension(open.FileName),
-                    Filter = "Images|*" + Path.GetExtension(open.FileName)
-                };
+                save = new SaveFileDialog();
+                save.InitialDirectory = Path.GetFullPath(@"..\..\pildid");
+                extension = Path.GetExtension(open.FileName);
+                save.FileName = Nimetus_txt.Text + extension;
+                save.Filter = "Images Files(*.jpeg;*.png;*.bmp;*.jpg)|*.jpeg;*.png;*.bmp;*.jpg";
 
                 if (save.ShowDialog() == DialogResult.OK)
                 {
-                    File.Copy(open.FileName, save.FileName, true);
-                    pictureBox1.Image = Image.FromFile(save.FileName);
+                    File.Copy(open.FileName, save.FileName, true);  
+                    pictureBox1.Image = Image.FromFile(save.FileName); 
                 }
             }
             else
             {
-                MessageBox.Show("Puudub toote nimetus või Cancel vajutatud", "Viga", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Puudub toode nimetus või ole Cancel vajutatud");
             }
         }
     }
