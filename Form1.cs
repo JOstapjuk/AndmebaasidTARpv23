@@ -10,11 +10,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+
 namespace AndmebaasidTARpv23
 {
     public partial class Form1 : Form
     {
-        SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\jeliz\source\repos\AndmebaasidTARpv23\Andmebaas.mdf;Integrated Security=True");
+        SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\opilane\Source\Repos\AndmebaasidTARpv23\Toode.mdf;Integrated Security=True");
         SqlCommand cmd;
         SqlDataAdapter adapter;
         OpenFileDialog open;
@@ -64,7 +65,7 @@ namespace AndmebaasidTARpv23
             }
         }
 
-        public void Btn_kustuta_Click(object sender, EventArgs e)
+        public async void Btn_kustuta_Click(object sender, EventArgs e)
         {
             if (Id_txt.Text.Trim() != string.Empty)
             {
@@ -75,6 +76,9 @@ namespace AndmebaasidTARpv23
                     cmd.Parameters.AddWithValue("@ID",Id_txt.Text);
                     cmd.ExecuteNonQuery();
                     conn.Close();
+                    await Kustuta_Faili(Nimetus_txt.Text + extension);
+                    await Task.Delay(1000);
+                    Emalda();
                     NaitaAndmed();
                 }
                 catch
@@ -91,6 +95,9 @@ namespace AndmebaasidTARpv23
                     cmd.Parameters.AddWithValue("@nimetus", Nimetus_txt.Text);
                     cmd.ExecuteNonQuery();
                     conn.Close();
+                    await Kustuta_Faili(Nimetus_txt.Text + extension);
+                    await Task.Delay(1000);
+                    Emalda();
                     NaitaAndmed();
                 }
                 catch
@@ -103,6 +110,66 @@ namespace AndmebaasidTARpv23
                 MessageBox.Show("Sisesta nimetus või ID");
             }
         }
+
+        private void Kustuta_Faili(string file)
+        {
+            try
+            {
+                string fullPath = Path.Combine(Environment.CurrentDirectory, @"pildid", file);
+
+                if (File.Exists(fullPath))
+                {
+                    File.SetAttributes(fullPath, FileAttributes.Normal);
+
+                    try
+                    {
+                        await Task.Run(() => File.DeleteAsync(fullPath));
+                        MessageBox.Show($"Faili kustutamine õnnestus!");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Valesti kustutamisel: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show($"Faili ei leitud: {fullPath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Tekkis vea faili kustutamisel! {ex.Message}");
+            }
+        }
+
+        //private async Kustuta_Faili(string file)
+        //{
+        //    try
+        //    {
+        //        string fullPath = Path.Combine(Environment.CurrentDirectory, @"pildid", file);
+
+        //        if (File.Exists(fullPath))
+        //        {
+        //            using (FileStream stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.None))
+        //            {
+        //                await stream.ReadAsync(new byte[1024], 0, 0);
+
+        //                stream.Close();
+        //            }
+
+        //            File.Delete(fullPath);
+        //            MessageBox.Show($"Faili kustutamine õnnestus!");
+        //        }
+        //        else
+        //        {
+        //            MessageBox.Show($"Faili ei leitud: {fullPath}");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show($"Tekkis vea faili kustutamisel! {ex.Message}");
+        //    }
+        //}
 
         private void Uuenda_btn_Click(object sender, EventArgs e)
         {
@@ -141,6 +208,8 @@ namespace AndmebaasidTARpv23
             Hind_txt.Text = "";
             pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\pildid"), "error.png"));
         }
+
+
 
         int ID = 0;
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
