@@ -65,7 +65,7 @@ namespace AndmebaasidTARpv23
             }
         }
 
-        public async void Btn_kustuta_Click(object sender, EventArgs e)
+        public void Btn_kustuta_Click(object sender, EventArgs e)
         {
             if (Id_txt.Text.Trim() != string.Empty)
             {
@@ -76,10 +76,14 @@ namespace AndmebaasidTARpv23
                     cmd.Parameters.AddWithValue("@ID",Id_txt.Text);
                     cmd.ExecuteNonQuery();
                     conn.Close();
-                    await Kustuta_Faili(Nimetus_txt.Text + extension);
-                    await Task.Delay(1000);
+
+                    string file = dataGridView1.SelectedRows[0].Cells["Pilt"].Value.ToString();
+
                     Emalda();
                     NaitaAndmed();
+                    System.Threading.Thread.Sleep(1000);
+                    //Kustuta_Faili(Nimetus_txt.Text + extension);
+                    Kustuta_Faili(file);
                 }
                 catch
                 {
@@ -95,10 +99,15 @@ namespace AndmebaasidTARpv23
                     cmd.Parameters.AddWithValue("@nimetus", Nimetus_txt.Text);
                     cmd.ExecuteNonQuery();
                     conn.Close();
-                    await Kustuta_Faili(Nimetus_txt.Text + extension);
-                    await Task.Delay(1000);
+
+                    string file = dataGridView1.SelectedRows[0].Cells["Pilt"].Value.ToString();
+
                     Emalda();
                     NaitaAndmed();
+                    System.Threading.Thread.Sleep(1000);
+                    //Kustuta_Faili(Nimetus_txt.Text + extension);
+                    Kustuta_Faili(file);
+
                 }
                 catch
                 {
@@ -113,33 +122,40 @@ namespace AndmebaasidTARpv23
 
         private void Kustuta_Faili(string file)
         {
-            try
+            System.Threading.Thread.Sleep(1000);
+            bool fail_kustutatud = false;
+            while (!fail_kustutatud) 
             {
-                string fullPath = Path.Combine(Environment.CurrentDirectory, @"pildid", file);
-
-                if (File.Exists(fullPath))
+                try
                 {
-                    File.SetAttributes(fullPath, FileAttributes.Normal);
+                    System.Threading.Thread.Sleep(1000);
+                    string fullPath = Path.Combine(Path.GetFullPath(@"..\..\pildid"), file);
 
-                    try
+                    if (File.Exists(fullPath))
                     {
-                        await Task.Run(() => File.DeleteAsync(fullPath));
-                        MessageBox.Show($"Faili kustutamine õnnestus!");
+                        File.SetAttributes(fullPath, FileAttributes.Normal);
+
+                        try
+                        {
+                            File.Delete(fullPath);
+                            MessageBox.Show($"Faili kustutamine õnnestus!");
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Valesti kustutamisel: {ex.Message}");
+                        }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        MessageBox.Show($"Valesti kustutamisel: {ex.Message}");
+                        MessageBox.Show($"Faili ei leitud: {fullPath}");
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    MessageBox.Show($"Faili ei leitud: {fullPath}");
+                    MessageBox.Show($"Tekkis vea faili kustutamisel! {ex.Message}");
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Tekkis vea faili kustutamisel! {ex.Message}");
-            }
+                fail_kustutatud = true;
+            }         
         }
 
         //private async Kustuta_Faili(string file)
