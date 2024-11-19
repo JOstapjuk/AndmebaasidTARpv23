@@ -15,7 +15,7 @@ namespace AndmebaasidTARpv23
 {
     public partial class Form1 : Form
     {
-        SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\opilane\Source\Repos\AndmebaasidTARpv23\Toode.mdf;Integrated Security=True");
+        SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\jeliz\source\repos\AndmebaasidTARpv23\Toode.mdf;Integrated Security=True");
         SqlCommand cmd;
         SqlDataAdapter adapter;
         OpenFileDialog open;
@@ -52,6 +52,7 @@ namespace AndmebaasidTARpv23
                     cmd.Parameters.AddWithValue("@pilt", Nimetus_txt.Text + extension);
                     cmd.ExecuteNonQuery();
                     conn.Close();
+                    Emalda();
                     NaitaAndmed();
                 }
                 catch (Exception ex)
@@ -85,9 +86,9 @@ namespace AndmebaasidTARpv23
                     //Kustuta_Faili(Nimetus_txt.Text + extension);
                     Kustuta_Faili(file);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    MessageBox.Show("Admebaasiga viga!");
+                    MessageBox.Show($"Admebaasiga viga! {ex}");
                 }
             }
             else if (Nimetus_txt.Text.Trim() != string.Empty)
@@ -103,15 +104,15 @@ namespace AndmebaasidTARpv23
                     string file = dataGridView1.SelectedRows[0].Cells["Pilt"].Value.ToString();
 
                     Emalda();
-                    NaitaAndmed();
                     System.Threading.Thread.Sleep(1000);
                     //Kustuta_Faili(Nimetus_txt.Text + extension);
                     Kustuta_Faili(file);
+                    NaitaAndmed();
 
                 }
-                catch
+                catch (Exception ex)
                 {
-                    MessageBox.Show("Admebaasiga viga!");
+                    MessageBox.Show($"Admebaasiga viga! {ex}");
                 }
             }
             else
@@ -122,40 +123,48 @@ namespace AndmebaasidTARpv23
 
         private void Kustuta_Faili(string file)
         {
-            System.Threading.Thread.Sleep(1000);
-            bool fail_kustutatud = false;
-            while (!fail_kustutatud) 
+            try
             {
-                try
-                {
-                    System.Threading.Thread.Sleep(1000);
-                    string fullPath = Path.Combine(Path.GetFullPath(@"..\..\pildid"), file);
+                string fullPath = Path.Combine(Path.GetFullPath(@"..\..\pildid"), file);
 
-                    if (File.Exists(fullPath))
+                if (File.Exists(fullPath))
+                {
+                    if (pictureBox1.Image != null)
+                    {
+                        pictureBox1.Image.Dispose();
+                        pictureBox1.Image = null;
+                    }
+
+                    // GC.Collect() sunnib .NET prügikogujat kohe käivitama.
+                    // See aitab tagada, et kõik viitamata objektid puhastatakse.
+                    GC.Collect();
+
+                    // WaitForPendingFinalizers() blokeerib praeguse lõime, kuni 
+                    // kõik järjekorras olevad finaliseerijad on töödeldud.
+                    // See tagab, et failikäepidemed ja muud ressursid on täielikult vabastatud.
+                    GC.WaitForPendingFinalizers();
+
+                    try
+                    {
+                        File.Delete(fullPath);
+                    }
+                    catch
                     {
                         File.SetAttributes(fullPath, FileAttributes.Normal);
+                        File.Delete(fullPath);
+                    }
 
-                        try
-                        {
-                            File.Delete(fullPath);
-                            MessageBox.Show($"Faili kustutamine õnnestus!");
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Valesti kustutamisel: {ex.Message}");
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show($"Faili ei leitud: {fullPath}");
-                    }
+                    MessageBox.Show($"Faili kustutamine õnnestus!");
                 }
-                catch (Exception ex)
+                else
                 {
-                    MessageBox.Show($"Tekkis vea faili kustutamisel! {ex.Message}");
+                    MessageBox.Show($"Faili ei leitud: {fullPath}");
                 }
-                fail_kustutatud = true;
-            }         
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Faili kustutamisel tekkis viga: {ex.Message}");
+            }
         }
 
         //private async Kustuta_Faili(string file)
@@ -265,8 +274,8 @@ namespace AndmebaasidTARpv23
 
                 if (save.ShowDialog() == DialogResult.OK)
                 {
-                    File.Copy(open.FileName, save.FileName, true);  
-                    pictureBox1.Image = Image.FromFile(save.FileName); 
+                    File.Copy(open.FileName, save.FileName, true);
+                    pictureBox1.Image = Image.FromFile(save.FileName);
                 }
             }
             else
