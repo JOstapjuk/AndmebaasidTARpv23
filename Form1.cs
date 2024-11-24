@@ -25,6 +25,7 @@ namespace AndmebaasidTARpv23
         {
             InitializeComponent();
             NaitaAndmed();
+            LoadLaduComboBox();
         }
 
         public void NaitaAndmed()
@@ -38,31 +39,73 @@ namespace AndmebaasidTARpv23
             conn.Close();
         }
 
-        public void Btn_lisa_Click(object sender, EventArgs e)
+        public void LoadLaduComboBox()
         {
-            if (Nimetus_txt.Text.Trim() != string.Empty && Kogus_txt.Text.Trim() != string.Empty && Hind_txt.Text.Trim() != string.Empty) 
+            try
             {
-                try 
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("SELECT Id, LaoNimetus FROM Ladu", conn);
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                LaduComboBox.Items.Clear();
+
+                while (reader.Read())
+                {
+                    LaduComboBox.Items.Add(new KeyValuePair<int, string>(
+                        (int)reader["Id"],
+                        reader["LaoNimetus"].ToString()
+                    ));
+                }
+
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading ComboBox: {ex.Message}");
+            }
+        }
+
+        private void Btn_lisa_Click(object sender, EventArgs e)
+        {
+            if (Nimetus_txt.Text.Trim() != string.Empty && Kogus_txt.Text.Trim() != string.Empty && Hind_txt.Text.Trim() != string.Empty)
+            {
+                try
                 {
                     conn.Open();
-                    cmd = new SqlCommand("insert into Toode(Nimetus,Kogus,Hind,Pilt) values (@nimetus,@kogus,@hind,@pilt)", conn); 
-                    cmd.Parameters.AddWithValue("@nimetus",Nimetus_txt.Text);
+                    int laduId;
+
+                    if (LaduComboBox.SelectedItem != null)
+                    {
+                        laduId = ((KeyValuePair<int, string>)LaduComboBox.SelectedItem).Key;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Palun vali või lisa Ladu enne toote lisamist!");
+                        conn.Close();
+                        return;
+                    }
+
+                    cmd = new SqlCommand("INSERT INTO Toode (Nimetus, Kogus, Hind, Pilt, LaoID) VALUES (@nimetus, @kogus, @hind, @pilt, @laduid)", conn);
+                    cmd.Parameters.AddWithValue("@nimetus", Nimetus_txt.Text);
                     cmd.Parameters.AddWithValue("@kogus", Kogus_txt.Text);
                     cmd.Parameters.AddWithValue("@hind", Hind_txt.Text);
                     cmd.Parameters.AddWithValue("@pilt", Nimetus_txt.Text + extension);
+                    cmd.Parameters.AddWithValue("@laduid", laduId); 
+
                     cmd.ExecuteNonQuery();
                     conn.Close();
+
                     Emalda();
                     NaitaAndmed();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Admebaasiga viga! \n\n{ex.Message}");
+                    MessageBox.Show($"Database error: {ex.Message}");
                 }
             }
             else
             {
-                MessageBox.Show("Sisesta andmed!");
+                MessageBox.Show("Sisesta kõik andmed enne toote lisamist!");
             }
         }
 
@@ -73,18 +116,27 @@ namespace AndmebaasidTARpv23
                 try
                 {
                     conn.Open();
+
+                    cmd = new SqlCommand("SELECT LaoID FROM Toode WHERE Id = @ID", conn);
+                    cmd.Parameters.AddWithValue("@ID", Id_txt.Text);
+                    int laduId = (int)cmd.ExecuteScalar();
+
                     cmd = new SqlCommand("delete from Toode where Id = @ID", conn);
-                    cmd.Parameters.AddWithValue("@ID",Id_txt.Text);
+                    cmd.Parameters.AddWithValue("@ID", Id_txt.Text);
                     cmd.ExecuteNonQuery();
+
+                    cmd = new SqlCommand("delete from Ladu where Id = @LaduId", conn);
+                    cmd.Parameters.AddWithValue("@LaduId", laduId);
+                    cmd.ExecuteNonQuery();
+
                     conn.Close();
 
                     string file = dataGridView1.SelectedRows[0].Cells["Pilt"].Value.ToString();
 
                     Emalda();
-                    NaitaAndmed();
                     System.Threading.Thread.Sleep(1000);
-                    //Kustuta_Faili(Nimetus_txt.Text + extension);
                     Kustuta_Faili(file);
+                    NaitaAndmed();
                 }
                 catch (Exception ex)
                 {
@@ -105,10 +157,8 @@ namespace AndmebaasidTARpv23
 
                     Emalda();
                     System.Threading.Thread.Sleep(1000);
-                    //Kustuta_Faili(Nimetus_txt.Text + extension);
                     Kustuta_Faili(file);
                     NaitaAndmed();
-
                 }
                 catch (Exception ex)
                 {
@@ -167,35 +217,6 @@ namespace AndmebaasidTARpv23
             }
         }
 
-        //private async Kustuta_Faili(string file)
-        //{
-        //    try
-        //    {
-        //        string fullPath = Path.Combine(Environment.CurrentDirectory, @"pildid", file);
-
-        //        if (File.Exists(fullPath))
-        //        {
-        //            using (FileStream stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.None))
-        //            {
-        //                await stream.ReadAsync(new byte[1024], 0, 0);
-
-        //                stream.Close();
-        //            }
-
-        //            File.Delete(fullPath);
-        //            MessageBox.Show($"Faili kustutamine õnnestus!");
-        //        }
-        //        else
-        //        {
-        //            MessageBox.Show($"Faili ei leitud: {fullPath}");
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show($"Tekkis vea faili kustutamisel! {ex.Message}");
-        //    }
-        //}
-
         private void Uuenda_btn_Click(object sender, EventArgs e)
         {
             if (Nimetus_txt.Text.Trim() != string.Empty && Kogus_txt.Text.Trim() != string.Empty && Hind_txt.Text.Trim() != string.Empty)
@@ -203,6 +224,12 @@ namespace AndmebaasidTARpv23
                 try
                 {
                     conn.Open();
+
+                    cmd = new SqlCommand("update Ladu SET LaoNimetus = @nimetus WHERE Id = @LaduId", conn);
+                    cmd.Parameters.AddWithValue("@nimetus", Nimetus_txt.Text); 
+                    cmd.Parameters.AddWithValue("@LaduId", Id_txt.Text);
+                    cmd.ExecuteNonQuery();
+
                     cmd = new SqlCommand("update Toode SET Nimetus = @nimetus, Kogus = @kogus, Hind = @hind, Pilt = @pilt WHERE Id = @ID", conn);
                     cmd.Parameters.AddWithValue("@nimetus", Nimetus_txt.Text);
                     cmd.Parameters.AddWithValue("@ID", Id_txt.Text);
@@ -210,6 +237,7 @@ namespace AndmebaasidTARpv23
                     cmd.Parameters.AddWithValue("@hind", Hind_txt.Text);
                     cmd.Parameters.AddWithValue("@pilt", Nimetus_txt.Text + extension);
                     cmd.ExecuteNonQuery();
+
                     conn.Close();
                     NaitaAndmed();
                     Emalda();
@@ -243,6 +271,19 @@ namespace AndmebaasidTARpv23
             Nimetus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Nimetus"].Value.ToString();
             Kogus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Kogus"].Value.ToString();
             Hind_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Hind"].Value.ToString();
+
+            int selectedLaduId = (int)dataGridView1.Rows[e.RowIndex].Cells["LaoID"].Value;
+
+            for (int i = 0; i < LaduComboBox.Items.Count; i++)
+            {
+                var item = (KeyValuePair<int, string>)LaduComboBox.Items[i];
+                if (item.Key == selectedLaduId)
+                {
+                    LaduComboBox.SelectedItem = item;
+                    break;
+                }
+            }
+
             try
             {
                 pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\pildid"),
@@ -282,6 +323,15 @@ namespace AndmebaasidTARpv23
             {
                 MessageBox.Show("Puudub toode nimetus või ole Cancel vajutatud");
             }
+        }
+
+        private void Ladu_add_Click(object sender, EventArgs e)
+        {
+            Form2 addLaduForm = new Form2();
+
+            addLaduForm.OnLaduAdded += LoadLaduComboBox;
+
+            addLaduForm.ShowDialog();
         }
     }
 }

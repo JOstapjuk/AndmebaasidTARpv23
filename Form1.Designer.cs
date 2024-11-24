@@ -47,6 +47,9 @@ namespace AndmebaasidTARpv23
             this.Uuenda_btn = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.Ladu = new System.Windows.Forms.Label();
+            this.LaduComboBox = new System.Windows.Forms.ComboBox();
+            this.Ladu_add = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.andmebaasDataSetBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.andmebaasBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -57,7 +60,7 @@ namespace AndmebaasidTARpv23
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F);
-            this.label1.Location = new System.Drawing.Point(20, 120);
+            this.label1.Location = new System.Drawing.Point(22, 77);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(135, 37);
@@ -66,7 +69,7 @@ namespace AndmebaasidTARpv23
             // 
             // Nimetus_txt
             // 
-            this.Nimetus_txt.Location = new System.Drawing.Point(168, 129);
+            this.Nimetus_txt.Location = new System.Drawing.Point(165, 88);
             this.Nimetus_txt.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Nimetus_txt.Name = "Nimetus_txt";
             this.Nimetus_txt.Size = new System.Drawing.Size(148, 26);
@@ -74,7 +77,7 @@ namespace AndmebaasidTARpv23
             // 
             // Kogus_txt
             // 
-            this.Kogus_txt.Location = new System.Drawing.Point(168, 183);
+            this.Kogus_txt.Location = new System.Drawing.Point(165, 139);
             this.Kogus_txt.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Kogus_txt.Name = "Kogus_txt";
             this.Kogus_txt.Size = new System.Drawing.Size(148, 26);
@@ -84,7 +87,7 @@ namespace AndmebaasidTARpv23
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F);
-            this.label2.Location = new System.Drawing.Point(48, 174);
+            this.label2.Location = new System.Drawing.Point(49, 129);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(108, 37);
@@ -93,7 +96,7 @@ namespace AndmebaasidTARpv23
             // 
             // Hind_txt
             // 
-            this.Hind_txt.Location = new System.Drawing.Point(168, 238);
+            this.Hind_txt.Location = new System.Drawing.Point(165, 192);
             this.Hind_txt.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Hind_txt.Name = "Hind_txt";
             this.Hind_txt.Size = new System.Drawing.Size(148, 26);
@@ -103,7 +106,7 @@ namespace AndmebaasidTARpv23
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F);
-            this.label3.Location = new System.Drawing.Point(74, 229);
+            this.label3.Location = new System.Drawing.Point(63, 181);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(83, 37);
@@ -121,13 +124,6 @@ namespace AndmebaasidTARpv23
             this.Btn_lisa.UseVisualStyleBackColor = true;
             this.Btn_lisa.Click += new System.EventHandler(this.Btn_lisa_Click);
             // 
-            // andmebaas
-            // 
-            // 
-            // andmebaasBindingSource
-            // 
-            this.andmebaasBindingSource.Position = 0;
-            // 
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -137,7 +133,7 @@ namespace AndmebaasidTARpv23
             this.dataGridView1.RowHeadersWidth = 62;
             this.dataGridView1.Size = new System.Drawing.Size(1016, 255);
             this.dataGridView1.TabIndex = 8;
-            this.dataGridView1.CellClick += new DataGridViewCellEventHandler(dataGridView1_CellClick);
+            this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
             // 
             // Btn_kustuta
             // 
@@ -198,11 +194,43 @@ namespace AndmebaasidTARpv23
             this.pictureBox1.TabIndex = 14;
             this.pictureBox1.TabStop = false;
             // 
+            // Ladu
+            // 
+            this.Ladu.AutoSize = true;
+            this.Ladu.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F);
+            this.Ladu.Location = new System.Drawing.Point(63, 232);
+            this.Ladu.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.Ladu.Name = "Ladu";
+            this.Ladu.Size = new System.Drawing.Size(89, 37);
+            this.Ladu.TabIndex = 15;
+            this.Ladu.Text = "Ladu";
+            // 
+            // LaduComboBox
+            // 
+            this.LaduComboBox.FormattingEnabled = true;
+            this.LaduComboBox.Location = new System.Drawing.Point(165, 242);
+            this.LaduComboBox.Name = "LaduComboBox";
+            this.LaduComboBox.Size = new System.Drawing.Size(148, 28);
+            this.LaduComboBox.TabIndex = 16;
+            // 
+            // Ladu_add
+            // 
+            this.Ladu_add.Location = new System.Drawing.Point(686, 300);
+            this.Ladu_add.Name = "Ladu_add";
+            this.Ladu_add.Size = new System.Drawing.Size(117, 45);
+            this.Ladu_add.TabIndex = 17;
+            this.Ladu_add.Text = "Lisa ladu";
+            this.Ladu_add.UseVisualStyleBackColor = true;
+            this.Ladu_add.Click += new System.EventHandler(this.Ladu_add_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1200, 692);
+            this.Controls.Add(this.Ladu_add);
+            this.Controls.Add(this.LaduComboBox);
+            this.Controls.Add(this.Ladu);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.Uuenda_btn);
@@ -247,6 +275,9 @@ namespace AndmebaasidTARpv23
         private System.Windows.Forms.Button Uuenda_btn;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private Label Ladu;
+        private ComboBox LaduComboBox;
+        private Button Ladu_add;
     }
 }
 
