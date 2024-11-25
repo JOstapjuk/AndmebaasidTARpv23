@@ -15,12 +15,14 @@ namespace AndmebaasidTARpv23
     {
         public event Action OnLaduAdded;  // Üritus vormi1 teavitamiseks
 
-        SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\jeliz\source\repos\AndmebaasidTARpv23\Toode.mdf;Integrated Security=True");
+        SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\opilane\Source\Repos\AndmebaasidTARpv23\Toode.mdf;Integrated Security=True");
         SqlCommand cmd;
+        SqlDataAdapter adapter;
 
         public Form2()
         {
             InitializeComponent();
+            NaitaAndmed()
         }
 
         private void btnAddLadu_Click_1(object sender, EventArgs e)
@@ -59,7 +61,77 @@ namespace AndmebaasidTARpv23
 
         private void btnCancel_Click_1(object sender, EventArgs e)
         {
+            OnLaduAdded?.Invoke();
             this.Close();
+        }
+
+        private void Kustuta_btn_Click(object sender, EventArgs e)
+        {
+            if (txtLaoNimetus.Text.Trim() != string.Empty)
+            {
+                try
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand("DELETE FROM Ladu WHERE LaoNimetus = @LaoNimetus", conn);
+                    cmd.Parameters.AddWithValue("@LaoNimetus", txtLaoNimetus.Text);
+                    cmd.ExecuteNonQuery();
+                    conn.Close();
+
+                    MessageBox.Show("Ladu kustutatud edukalt!");
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Viga ladu kustutamisel: {ex.Message}");
+                }
+                OnLaduAdded?.Invoke();
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Sisesta ladu nimetus!");
+            }
+        }
+
+        private void Uuenda_btn_Click(object sender, EventArgs e)
+        {
+            if (txtLaoNimetus.Text.Trim() != string.Empty)
+            {
+                try
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand("UPDATE Ladu SET Suurus = @Suurus, Kirjeldus = @Kirjeldus WHERE LaoNimetus = @LaoNimetus", conn);
+                    cmd.Parameters.AddWithValue("@LaoNimetus", txtLaoNimetus.Text);
+                    cmd.Parameters.AddWithValue("@Suurus", txtSuurus.Text);
+                    cmd.Parameters.AddWithValue("@Kirjeldus", txtKirjeldus.Text);
+                    cmd.ExecuteNonQuery();
+                    conn.Close();
+
+                    MessageBox.Show("Ladu uuendatud edukalt!");
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Viga ladu uuendamisel: {ex.Message}");
+                }
+                OnLaduAdded?.Invoke();
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Sisesta ladu nimetus!");
+            }
+        }
+
+        public void NaitaAndmed()
+        {
+            conn.Open();
+            DataTable dt = new DataTable();
+            cmd = new SqlCommand("SELECT * FROM Ladu", conn);
+            adapter = new SqlDataAdapter(cmd);
+            adapter.Fill(dt);
+            dataGridView2.DataSource = dt;
+            conn.Close();
         }
     }
 }

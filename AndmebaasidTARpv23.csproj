@@ -120,13 +120,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Ladu.mdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Ladu_log.ldf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>Ladu.mdf</DependentUpon>
-    </Content>
     <Content Include="Toode.mdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
