@@ -124,13 +124,28 @@ namespace AndmebaasidTARpv23
                 MessageBox.Show("Sisesta ladu nimetus!");
             }
         }
-
         private void dataGridView2_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            ID = (int)dataGridView2.Rows[e.RowIndex].Cells["Id"].Value;
-            txtLaoNimetus.Text = dataGridView2.Rows[e.RowIndex].Cells["LaoNimetus"].Value.ToString();
-            txtSuurus.Text = dataGridView2.Rows[e.RowIndex].Cells["Suurus"].Value.ToString();
-            txtKirjeldus.Text = dataGridView2.Rows[e.RowIndex].Cells["Kirjeldus"].Value.ToString();
+            if (e.RowIndex < 0) return;
+
+            try
+            {
+                if (dataGridView2.Rows[e.RowIndex].Cells["Id"].Value != null)
+                {
+                    ID = Convert.ToInt32(dataGridView2.Rows[e.RowIndex].Cells["Id"].Value);
+                    txtLaoNimetus.Text = dataGridView2.Rows[e.RowIndex].Cells["LaoNimetus"].Value.ToString();
+                    txtSuurus.Text = dataGridView2.Rows[e.RowIndex].Cells["Suurus"].Value.ToString();
+                    txtKirjeldus.Text = dataGridView2.Rows[e.RowIndex].Cells["Kirjeldus"].Value.ToString();
+                }
+                else
+                {
+                    MessageBox.Show("Ei ole id");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+            }
         }
 
         public void NaitaAndmed()

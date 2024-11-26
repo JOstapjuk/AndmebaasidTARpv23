@@ -21,6 +21,7 @@ namespace AndmebaasidTARpv23
         OpenFileDialog open;
         SaveFileDialog save;
         string extension;
+        int ID = 0;
         public Form1()
         {
             InitializeComponent();
@@ -61,7 +62,7 @@ namespace AndmebaasidTARpv23
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading ComboBox: {ex.Message}");
+                MessageBox.Show($"Error: {ex.Message}");
             }
         }
 
@@ -104,13 +105,23 @@ namespace AndmebaasidTARpv23
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Database error: {ex.Message}");
+                    MessageBox.Show($"error: {ex.Message}");
                 }
             }
             else
             {
                 MessageBox.Show("Sisesta kõik andmed enne toote lisamist!");
             }
+        }
+
+        private void Emalda()
+        {
+            MessageBox.Show("Andmed elukalt uuendatud", "Uuendamine");
+            Nimetus_txt.Text = "";
+            Kogus_txt.Text = "";
+            Hind_txt.Text = "";
+            pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\pildid"), "error.png"));
+            LaduComboBox.SelectedIndex = -1;
         }
 
         public void Btn_kustuta_Click(object sender, EventArgs e)
@@ -222,17 +233,19 @@ namespace AndmebaasidTARpv23
                 {
                     conn.Open();
 
-                    cmd = new SqlCommand("update Ladu SET LaoNimetus = @nimetus WHERE Id = @LaduId", conn);
-                    cmd.Parameters.AddWithValue("@nimetus", Nimetus_txt.Text);
-                    cmd.Parameters.AddWithValue("@LaduId", Id_txt.Text);
-                    cmd.ExecuteNonQuery();
-
-                    cmd = new SqlCommand("update Toode SET Nimetus = @nimetus, Kogus = @kogus, Hind = @hind, Pilt = @pilt WHERE Id = @ID", conn);
+                    cmd = new SqlCommand("UPDATE Toode SET Nimetus = @nimetus, Kogus = @kogus, Hind = @hind, Pilt = @pilt, LaoID = @laduid WHERE Id = @ID", conn);
                     cmd.Parameters.AddWithValue("@nimetus", Nimetus_txt.Text);
                     cmd.Parameters.AddWithValue("@ID", Id_txt.Text);
                     cmd.Parameters.AddWithValue("@kogus", Kogus_txt.Text);
                     cmd.Parameters.AddWithValue("@hind", Hind_txt.Text);
                     cmd.Parameters.AddWithValue("@pilt", Nimetus_txt.Text + extension);
+
+                    int laduId;
+
+                    laduId = ((KeyValuePair<int, string>)LaduComboBox.SelectedItem).Key;
+                    
+                    cmd.Parameters.AddWithValue("@laduid", laduId);
+
                     cmd.ExecuteNonQuery();
 
                     conn.Close();
@@ -250,50 +263,58 @@ namespace AndmebaasidTARpv23
             }
         }
 
-        private void Emalda()
-        {
-            MessageBox.Show("Andmed elukalt uuendatud", "Uuendamine");
-            Nimetus_txt.Text = "";
-            Kogus_txt.Text = "";
-            Hind_txt.Text = "";
-            pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\pildid"), "error.png"));
-        }
 
 
-
-        int ID = 0;
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            ID = (int)dataGridView1.Rows[e.RowIndex].Cells["Id"].Value;
-            Nimetus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Nimetus"].Value.ToString();
-            Kogus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Kogus"].Value.ToString();
-            Hind_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Hind"].Value.ToString();
-
-            int selectedLaduId = (int)dataGridView1.Rows[e.RowIndex].Cells["LaoID"].Value;
-
-            for (int i = 0; i < LaduComboBox.Items.Count; i++)
-            {
-                var item = (KeyValuePair<int, string>)LaduComboBox.Items[i];
-                if (item.Key == selectedLaduId)
-                {
-                    LaduComboBox.SelectedItem = item;
-                    break;
-                }
-            }
+            if (e.RowIndex < 0) return;
 
             try
             {
-                pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\pildid"),
-                    dataGridView1.Rows[e.RowIndex].Cells["Pilt"].Value.ToString()));
-                pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+                if (dataGridView1.Rows[e.RowIndex].Cells["Id"].Value != null)
+                {
+                    ID = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells["Id"].Value);
+                    Id_txt.Text = ID.ToString();
+
+                    Nimetus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Nimetus"].Value.ToString();
+                    Kogus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Kogus"].Value.ToString();
+                    Hind_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Hind"].Value.ToString();
+
+                    int selectedLaduId = (int)dataGridView1.Rows[e.RowIndex].Cells["LaoID"].Value;
+
+                    for (int i = 0; i < LaduComboBox.Items.Count; i++)
+                    {
+                        var item = (KeyValuePair<int, string>)LaduComboBox.Items[i];
+                        if (item.Key == selectedLaduId)
+                        {
+                            LaduComboBox.SelectedItem = item;
+                            break;
+                        }
+                    }
+
+                    try
+                    {
+                        pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\pildid"),
+                            dataGridView1.Rows[e.RowIndex].Cells["Pilt"].Value.ToString()));
+                        pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+                    }
+                    catch (Exception)
+                    {
+                        pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\pildid"), "error.png"));
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("ei ole id");
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\pildid"), "error.png"));
+                MessageBox.Show($"Error: {ex.Message}");
             }
         }
 
-
+        
 
         private void button1_Click(object sender, EventArgs e)
         {
