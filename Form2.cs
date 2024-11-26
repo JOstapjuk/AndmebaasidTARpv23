@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,11 +19,12 @@ namespace AndmebaasidTARpv23
         SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\opilane\Source\Repos\AndmebaasidTARpv23\Toode.mdf;Integrated Security=True");
         SqlCommand cmd;
         SqlDataAdapter adapter;
+        int ID = 0;
 
         public Form2()
         {
             InitializeComponent();
-            NaitaAndmed()
+            NaitaAndmed();
         }
 
         private void btnAddLadu_Click_1(object sender, EventArgs e)
@@ -78,14 +80,14 @@ namespace AndmebaasidTARpv23
                     conn.Close();
 
                     MessageBox.Show("Ladu kustutatud edukalt!");
+                    OnLaduAdded?.Invoke();
+                    this.Close();
 
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Viga ladu kustutamisel: {ex.Message}");
                 }
-                OnLaduAdded?.Invoke();
-                this.Close();
             }
             else
             {
@@ -108,19 +110,27 @@ namespace AndmebaasidTARpv23
                     conn.Close();
 
                     MessageBox.Show("Ladu uuendatud edukalt!");
+                    OnLaduAdded?.Invoke();
+                    this.Close();
 
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Viga ladu uuendamisel: {ex.Message}");
                 }
-                OnLaduAdded?.Invoke();
-                this.Close();
             }
             else
             {
                 MessageBox.Show("Sisesta ladu nimetus!");
             }
+        }
+
+        private void dataGridView2_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            ID = (int)dataGridView2.Rows[e.RowIndex].Cells["Id"].Value;
+            txtLaoNimetus.Text = dataGridView2.Rows[e.RowIndex].Cells["LaoNimetus"].Value.ToString();
+            txtSuurus.Text = dataGridView2.Rows[e.RowIndex].Cells["Suurus"].Value.ToString();
+            txtKirjeldus.Text = dataGridView2.Rows[e.RowIndex].Cells["Kirjeldus"].Value.ToString();
         }
 
         public void NaitaAndmed()

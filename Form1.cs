@@ -21,7 +21,6 @@ namespace AndmebaasidTARpv23
         OpenFileDialog open;
         SaveFileDialog save;
         string extension;
-        int ID = 0;
         public Form1()
         {
             InitializeComponent();
@@ -62,7 +61,7 @@ namespace AndmebaasidTARpv23
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}");
+                MessageBox.Show($"Error loading ComboBox: {ex.Message}");
             }
         }
 
@@ -86,7 +85,7 @@ namespace AndmebaasidTARpv23
                         return;
                     }
 
-                    cmd = new SqlCommand("INSERT INTO Toode (Nimetus, Kogus, Hind, Pilt, PiltFus,LaoID) VALUES (@nimetus, @kogus, @hind, @pilt, @fpilt, @laduid)", conn);
+                    cmd = new SqlCommand("INSERT INTO Toode (Nimetus, Kogus, Hind, Pilt, PiltFus,LaoID) VALUES (@nimetus, @kogus, @hind, @pilt, @fpilt,@laduid)", conn);
                     cmd.Parameters.AddWithValue("@nimetus", Nimetus_txt.Text);
                     cmd.Parameters.AddWithValue("@kogus", Kogus_txt.Text);
                     cmd.Parameters.AddWithValue("@hind", Hind_txt.Text);
@@ -105,7 +104,7 @@ namespace AndmebaasidTARpv23
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error: {ex.Message}");
+                    MessageBox.Show($"Database error: {ex.Message}");
                 }
             }
             else
@@ -122,17 +121,10 @@ namespace AndmebaasidTARpv23
                 {
                     conn.Open();
 
-                    cmd = new SqlCommand("SELECT LaoID FROM Toode WHERE Id = @ID", conn);
-                    cmd.Parameters.AddWithValue("@ID", Id_txt.Text);
-                    int laduId = (int)cmd.ExecuteScalar();
 
                     cmd = new SqlCommand("delete from Toode where Id = @ID", conn);
                     cmd.Parameters.AddWithValue("@ID", Id_txt.Text);
-                    cmd.ExecuteNonQuery();
-
-                    cmd = new SqlCommand("delete from Ladu where Id = @LaduId", conn);
-                    cmd.Parameters.AddWithValue("@LaduId", laduId);
-                    cmd.ExecuteNonQuery();
+                    cmd.ExecuteNonQuery(); 
 
                     conn.Close();
 
@@ -230,54 +222,31 @@ namespace AndmebaasidTARpv23
                 {
                     conn.Open();
 
-                    cmd = new SqlCommand("UPDATE Toode SET Nimetus = @nimetus, Kogus = @kogus, Hind = @hind WHERE Id = @ID", conn);
+                    cmd = new SqlCommand("update Ladu SET LaoNimetus = @nimetus WHERE Id = @LaduId", conn);
                     cmd.Parameters.AddWithValue("@nimetus", Nimetus_txt.Text);
-                    cmd.Parameters.AddWithValue("@ID", ID);
-                    cmd.Parameters.AddWithValue("@kogus", Kogus_txt.Text);
-                    cmd.Parameters.AddWithValue("@hind", Hind_txt.Text);
-
+                    cmd.Parameters.AddWithValue("@LaduId", Id_txt.Text);
                     cmd.ExecuteNonQuery();
 
-                    if (open.ShowDialog() == DialogResult.OK)
-                    {
-                        string oldImageFileName = dataGridView1.SelectedRows[0].Cells["Pilt"].Value.ToString();
-                        string oldImagePath = Path.Combine(Path.GetFullPath(@"..\..\pildid"), oldImageFileName);
-
-                        if (File.Exists(oldImagePath))
-                        {
-                            File.Delete(oldImagePath);
-                        }
-
-                        string newImageName = Nimetus_txt.Text + extension;
-                        string newImagePath = Path.Combine(Path.GetFullPath(@"..\..\pildid"), newImageName);
-                        File.Copy(open.FileName, newImagePath, true);
-
-                        byte[] imageData = File.ReadAllBytes(newImagePath);
-
-                        cmd = new SqlCommand("UPDATE Toode SET Pilt = @pilt, PiltFus = @fpilt WHERE Id = @ID", conn);
-                        cmd.Parameters.AddWithValue("@pilt", newImageName);
-                        cmd.Parameters.AddWithValue("@fpilt", imageData);
-                        cmd.Parameters.AddWithValue("@ID", ID);
-                        cmd.ExecuteNonQuery();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Toote pilt ei muutunud.");
-                    }
+                    cmd = new SqlCommand("update Toode SET Nimetus = @nimetus, Kogus = @kogus, Hind = @hind, Pilt = @pilt WHERE Id = @ID", conn);
+                    cmd.Parameters.AddWithValue("@nimetus", Nimetus_txt.Text);
+                    cmd.Parameters.AddWithValue("@ID", Id_txt.Text);
+                    cmd.Parameters.AddWithValue("@kogus", Kogus_txt.Text);
+                    cmd.Parameters.AddWithValue("@hind", Hind_txt.Text);
+                    cmd.Parameters.AddWithValue("@pilt", Nimetus_txt.Text + extension);
+                    cmd.ExecuteNonQuery();
 
                     conn.Close();
-
                     NaitaAndmed();
                     Emalda();
                 }
-                catch (Exception ex)
+                catch
                 {
-                    MessageBox.Show($"Viga andmebaasis: {ex.Message}");
+                    MessageBox.Show("Admebaasiga viga!");
                 }
             }
             else
             {
-                MessageBox.Show("Sisesta kõik andmed enne uuendamist!");
+                MessageBox.Show("Sisesta andmed mille tahate uuenda");
             }
         }
 
@@ -288,19 +257,17 @@ namespace AndmebaasidTARpv23
             Kogus_txt.Text = "";
             Hind_txt.Text = "";
             pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\pildid"), "error.png"));
-            LaduComboBox.SelectedIndex = 0;
         }
 
 
 
+        int ID = 0;
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             ID = (int)dataGridView1.Rows[e.RowIndex].Cells["Id"].Value;
             Nimetus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Nimetus"].Value.ToString();
             Kogus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Kogus"].Value.ToString();
             Hind_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Hind"].Value.ToString();
-            Id = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells["Id"].Value);
-            Id_txt.Text = Id.ToString();
 
             int selectedLaduId = (int)dataGridView1.Rows[e.RowIndex].Cells["LaoID"].Value;
 
