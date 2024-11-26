@@ -39,6 +39,8 @@
             this.Uuenda_btn = new System.Windows.Forms.Button();
             this.Kustuta_btn = new System.Windows.Forms.Button();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
+            this.IdTxt = new System.Windows.Forms.TextBox();
+            this.IdLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.SuspendLayout();
             // 
@@ -152,11 +154,32 @@
             this.dataGridView2.TabIndex = 10;
             this.dataGridView2.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView2_CellClick);
             // 
+            // IdTxt
+            // 
+            this.IdTxt.Location = new System.Drawing.Point(322, 44);
+            this.IdTxt.Margin = new System.Windows.Forms.Padding(2);
+            this.IdTxt.Name = "IdTxt";
+            this.IdTxt.Size = new System.Drawing.Size(93, 20);
+            this.IdTxt.TabIndex = 11;
+            // 
+            // IdLabel
+            // 
+            this.IdLabel.AutoSize = true;
+            this.IdLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IdLabel.Location = new System.Drawing.Point(288, 39);
+            this.IdLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.IdLabel.Name = "IdLabel";
+            this.IdLabel.Size = new System.Drawing.Size(30, 26);
+            this.IdLabel.TabIndex = 12;
+            this.IdLabel.Text = "Id";
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(533, 420);
+            this.Controls.Add(this.IdLabel);
+            this.Controls.Add(this.IdTxt);
             this.Controls.Add(this.dataGridView2);
             this.Controls.Add(this.Kustuta_btn);
             this.Controls.Add(this.Uuenda_btn);
@@ -190,5 +213,7 @@
         private System.Windows.Forms.Button Uuenda_btn;
         private System.Windows.Forms.Button Kustuta_btn;
         private System.Windows.Forms.DataGridView dataGridView2;
+        private System.Windows.Forms.TextBox IdTxt;
+        private System.Windows.Forms.Label IdLabel;
     }
 }

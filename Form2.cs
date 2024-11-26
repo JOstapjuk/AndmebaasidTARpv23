@@ -133,6 +133,7 @@ namespace AndmebaasidTARpv23
                 if (dataGridView2.Rows[e.RowIndex].Cells["Id"].Value != null)
                 {
                     ID = Convert.ToInt32(dataGridView2.Rows[e.RowIndex].Cells["Id"].Value);
+                    IdTxt.Text = ID.ToString();
                     txtLaoNimetus.Text = dataGridView2.Rows[e.RowIndex].Cells["LaoNimetus"].Value.ToString();
                     txtSuurus.Text = dataGridView2.Rows[e.RowIndex].Cells["Suurus"].Value.ToString();
                     txtKirjeldus.Text = dataGridView2.Rows[e.RowIndex].Cells["Kirjeldus"].Value.ToString();
